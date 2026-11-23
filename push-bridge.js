@@ -16,3 +16,11 @@ window.monitorUnsubscribe = async function() {
  const result=JSON.stringify(sub.toJSON());await sub.unsubscribe();return result;
 };
 if ('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register(new URL('sw.js',document.baseURI),{scope:new URL('./',document.baseURI).pathname}).catch(()=>{}));
+
+window.monitorPushState = async function() {
+ const supported = window.isSecureContext && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+ if (!supported) return JSON.stringify({supported:false,permission:'unsupported',endpoint:null});
+ const reg=await navigator.serviceWorker.getRegistration(new URL('./',document.baseURI));
+ const sub=await reg?.pushManager.getSubscription();
+ return JSON.stringify({supported:true,permission:Notification.permission,endpoint:sub?.endpoint||null});
+};

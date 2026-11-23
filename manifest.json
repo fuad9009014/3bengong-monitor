@@ -9,13 +9,13 @@
   "description": "Private server health and security alerts",
   "icons": [
     {
-      "src": "icons/Icon-192.png?v=1489f1464373d01a",
+      "src": "icons/Icon-192.png?v=147abd9f5df8f212",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/Icon-512.png?v=1489f1464373d01a",
+      "src": "icons/Icon-512.png?v=147abd9f5df8f212",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
