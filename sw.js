@@ -1,4 +1,4 @@
-const CACHE='3bm-shell-d476e30cda2e90ce';
+const CACHE='3bm-shell-2c9c3c5ecc1be9c5';
 const BASE=new URL('./',self.registration.scope);
 self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);await cache.addAll(['./','index.html','flutter_bootstrap.js','flutter.js','main.dart.js','manifest.json','push-bridge.js','device-auth.js'].map(p=>new URL(p,BASE).href));await self.skipWaiting();})()));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{const old=(await caches.keys()).filter(name=>name.startsWith('3bm-shell-')&&name!==CACHE);for(const name of old)await caches.delete(name);await self.clients.claim();if(old.length){for(const c of await self.clients.matchAll({type:'window',includeUncontrolled:true}))if(c.url.startsWith(BASE.href))await c.navigate(c.url);}})()));
