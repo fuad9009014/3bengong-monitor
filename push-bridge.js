@@ -1,4 +1,4 @@
-const monitorDeadline = (p,ms,message) => Promise.race([p,new Promise((_,reject)=>setTimeout(()=>reject(new Error(message)),ms))]);
+const monitorDeadline = (p,ms,message) => new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error(message)),ms);Promise.resolve(p).then(v=>{clearTimeout(timer);resolve(v);},e=>{clearTimeout(timer);reject(e);});});
 window.monitorSubscribe = async function(key) {
  if (!window.isSecureContext || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) throw new Error('Push is not available here. On iPhone, add this app to your Home Screen and open it there.');
  const permission = await monitorDeadline(Notification.requestPermission(),30000,'Notification permission is still pending. Use Chrome or install this PWA on your phone, then try Enable again.');
