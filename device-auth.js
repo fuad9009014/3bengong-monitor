@@ -6,6 +6,28 @@
  const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
  let loading;
  const read=(db)=>new Promise((resolve,reject)=>{const r=db.transaction('keys').objectStore('keys').get('primary');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+ // Store the device-bound session alongside its non-extractable identity.
+ // A logout tombstone prevents a legacy tab restoring a manually cleared token.
+ async function sessionStore(action,token='') {
+  const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('3bm-device-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('keys');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.onblocked=()=>reject(new Error('Close other monitor tabs and retry.'));});
+  try{return await new Promise((resolve,reject)=>{
+   const tx=db.transaction('keys',action==='read'&&!token?'readonly':'readwrite'),store=tx.objectStore('keys');let result;
+   const request=store.get('monitor-session');
+   request.onsuccess=()=>{
+    const current=request.result;
+    if(action==='clear')result={token:null,logged_out:true};
+    else if(action==='save') {
+     if(!/^[a-f0-9]{64}$/.test(token)){tx.abort();return;}
+     result={token,logged_out:false};
+    } else result=current||{token:/^[a-f0-9]{64}$/.test(token)?token:null,logged_out:false};
+    if(action!=='read'||(!current&&result.token))store.put(result,'monitor-session');
+   };
+   tx.oncomplete=()=>resolve(JSON.stringify(result));tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('Device session could not be stored'));
+  });}finally{db.close();}
+ }
+ window.monitorSessionRead=legacy=>sessionStore('read',legacy);
+ window.monitorSessionSave=token=>sessionStore('save',token);
+ window.monitorSessionClear=()=>sessionStore('clear');
  async function loadDevice(){
   if(!window.isSecureContext||!crypto.subtle||!window.indexedDB)throw new Error('Use a supported HTTPS browser with device storage enabled. Private/incognito mode is not supported.');
   const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('3bm-device-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('keys');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.onblocked=()=>reject(new Error('Close other monitor tabs and retry.'));});
