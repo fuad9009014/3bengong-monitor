@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "versions": {
-    "Flutter": "3.50.0",
+    "Flutter": "3.50.1",
     "Dart": "3.14.0"
   },
   "artifact": "flutter_bootstrap.js",
-  "sha256": "dfeee390d7a54d7d128280dc18831edc0e9e1aafd908cbc534de50dae9a6af32"
+  "sha256": "d15bebc8c4ab1131098e49439ff8c559df65566f439b46b52960cbe3654c3506"
 }
